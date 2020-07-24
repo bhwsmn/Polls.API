@@ -1,0 +1,8 @@
+/Skim.API/bin/
+bin/
+.idea/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/Skim.API/Migrations/
