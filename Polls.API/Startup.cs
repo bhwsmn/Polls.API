@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Net;
+using System.Reflection;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Polls.API.DbContexts;
 using Polls.API.Services;
 
@@ -42,6 +45,20 @@ namespace Polls.API
                 options.UseSqlite("Data Source=/Database/Polls.API.db");
             });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Polls API",
+                    Description = "An API for a minimalistic polls/survey service.",
+                    License = new OpenApiLicense
+                    {
+                        Name = "GNU General Public License v3.0",
+                        Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.en.html"),
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +72,15 @@ namespace Polls.API
             // Change this according to production deployment requirements
             app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
+            app.UseSwagger();
+            
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Polls API");
+                
+                c.RoutePrefix = string.Empty;
+            });
+            
             app.UseRouting();
 
             app.UseAuthorization();
